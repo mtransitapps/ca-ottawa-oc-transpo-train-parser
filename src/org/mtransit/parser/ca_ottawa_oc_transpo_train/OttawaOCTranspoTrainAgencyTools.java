@@ -14,7 +14,6 @@ import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
-import org.mtransit.parser.mt.data.MSpec;
 import org.mtransit.parser.mt.data.MTrip;
 
 // http://www.octranspo1.com/developers
@@ -78,21 +77,18 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	public long getRouteId(GRoute gRoute) {
 		Matcher matcher = DIGITS.matcher(gRoute.route_id);
 		matcher.find();
-		int digits = Integer.parseInt(matcher.group());
-		int routeId;
-		routeId = 0;
-		return routeId + digits;
+		return Long.parseLong(matcher.group());
 	}
+
+	private static final String ROUTE_750_SHORT_NAME = "O-Train";
 
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
-		Matcher matcher = DIGITS.matcher(gRoute.route_id);
-		matcher.find();
-		int digits = Integer.parseInt(matcher.group());
-		if (digits == 750) {
-			return "O-Train";
+		long routeId = getRouteId(gRoute);
+		if (routeId == 750l) {
+			return ROUTE_750_SHORT_NAME;
 		} else {
-			System.out.println("No route short name for " + gRoute);
+			System.out.println("RSN > Unexpected route ID '" + routeId + "' (" + gRoute + ")");
 			System.exit(-1);
 			return null;
 		}
@@ -100,15 +96,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		Matcher matcher = DIGITS.matcher(gRoute.route_id);
-		matcher.find();
-		int digits = Integer.parseInt(matcher.group());
-		switch (digits) {
-		// @formatter:off
-		case 750: return "Bayview <-> Greenboro";
-		// @formatter:on
-		default:
-			System.out.println("getRouteLongName() > Unexpected route ID '" + digits + "' (" + gRoute + ")");
+		long routeId = getRouteId(gRoute);
+		if (routeId == 750l) {
+			return ROUTE_750_LONG_NAME;
+		} else {
+			System.out.println("RLN > Unexpected route ID '" + routeId + "' (" + gRoute + ")");
 			System.exit(-1);
 			return null;
 		}
@@ -147,7 +139,17 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
-		return MSpec.cleanLabel(tripHeadsign);
+		return tripHeadsign; // DO NOT CLEAN, USED TO IDENTIY TRIP IN REAL TIME API
+	}
+
+	@Override
+	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
+		if (mTrip.getHeadsignValue() == null || mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
+			System.out.println("Can't merge headsign for trips " + mTrip + " and " + mTripToMerge);
+			System.exit(-1);
+			return false; // DO NOT MERGE, USED TO IDENTIY TRIP IN REAL TIME API
+		}
+		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
 
 	@Override
