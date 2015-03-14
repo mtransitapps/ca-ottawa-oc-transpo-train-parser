@@ -186,6 +186,8 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			stopId = 800000;
 		} else if (gStop.stop_id.startsWith("WL")) {
 			stopId = 900000;
+		} else if (gStop.stop_id.startsWith("place")) {
+			stopId = 1000000;
 		} else {
 			System.out.println("Stop doesn't have an ID (start with)! " + gStop);
 			System.exit(-1);
