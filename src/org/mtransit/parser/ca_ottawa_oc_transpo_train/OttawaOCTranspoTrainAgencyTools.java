@@ -10,6 +10,7 @@ import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
 import org.mtransit.parser.gtfs.data.GRoute;
+import org.mtransit.parser.gtfs.data.GSpec;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
@@ -133,15 +134,13 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public void setTripHeadsign(MRoute route, MTrip mTrip, GTrip gTrip) {
-		String stationName = cleanTripHeadsign(gTrip.trip_headsign);
-		int directionId = gTrip.direction_id;
-		mTrip.setHeadsignString(stationName, directionId);
+	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
+		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.trip_headsign), gTrip.direction_id);
 	}
 
 	@Override
 	public String cleanTripHeadsign(String tripHeadsign) {
-		return tripHeadsign; // DO NOT CLEAN, USED TO IDENTIY TRIP IN REAL TIME API
+		return tripHeadsign; // DO NOT CLEAN, USED TO IDENTIFY TRIP IN REAL TIME API
 	}
 
 	@Override
@@ -149,7 +148,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		if (mTrip.getHeadsignValue() == null || mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
 			System.out.println("Can't merge headsign for trips " + mTrip + " and " + mTripToMerge);
 			System.exit(-1);
-			return false; // DO NOT MERGE, USED TO IDENTIY TRIP IN REAL TIME API
+			return false; // DO NOT MERGE, USED TO IDENTIFY TRIP IN REAL TIME API
 		}
 		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
