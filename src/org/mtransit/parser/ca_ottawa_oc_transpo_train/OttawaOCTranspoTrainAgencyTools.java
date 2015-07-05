@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
@@ -153,9 +154,12 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
 
+	private static final Pattern ENDS_WITH_DIRECTION = Pattern.compile("(n\\.|s\\.)", Pattern.CASE_INSENSITIVE);
+
 	@Override
 	public String cleanStopName(String gStopName) {
 		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		gStopName = ENDS_WITH_DIRECTION.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		return super.cleanStopName(gStopName);
 	}
 
