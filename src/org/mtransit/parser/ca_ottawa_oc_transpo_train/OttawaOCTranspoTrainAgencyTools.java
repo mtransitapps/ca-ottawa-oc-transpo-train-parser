@@ -96,7 +96,13 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		}
 	}
 
-	private static final String ROUTE_750_LONG_NAME = "Bayview <-> Greenboro";
+	private static final String RLN_SEPARATOR = "-";
+	private static final String RLN_SEP = " " + RLN_SEPARATOR + " ";
+
+	private static final String GREENBORO = "Greenboro";
+	private static final String BAYVIEW = "Bayview";
+
+	private static final String ROUTE_750_LONG_NAME = BAYVIEW + RLN_SEP + GREENBORO;
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
