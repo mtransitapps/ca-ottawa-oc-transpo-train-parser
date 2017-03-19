@@ -78,8 +78,12 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public long getRouteId(GRoute gRoute) {
 		Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
-		matcher.find();
-		return Long.parseLong(matcher.group());
+		if (matcher.find()) {
+			return Long.parseLong(matcher.group());
+		}
+		System.out.printf("\nUnexpected route ID %s!\n", gRoute);
+		System.exit(-1);
+		return -1l;
 	}
 
 	private static final String ROUTE_750_SHORT_NAME = "O-Train";
@@ -89,11 +93,10 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		long routeId = getRouteId(gRoute);
 		if (routeId == 750l) {
 			return ROUTE_750_SHORT_NAME;
-		} else {
-			System.out.println("RSN > Unexpected route ID '" + routeId + "' (" + gRoute + ")");
-			System.exit(-1);
-			return null;
 		}
+		System.out.printf("\nUnexpected route short name %s!\n", gRoute);
+		System.exit(-1);
+		return null;
 	}
 
 	private static final String RLN_SEPARATOR = "-";
@@ -109,11 +112,10 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		long routeId = getRouteId(gRoute);
 		if (routeId == 750l) {
 			return ROUTE_750_LONG_NAME;
-		} else {
-			System.out.println("RLN > Unexpected route ID '" + routeId + "' (" + gRoute + ")");
-			System.exit(-1);
-			return null;
 		}
+		System.out.printf("\nUnexpected route long name %s!\n", gRoute);
+		System.exit(-1);
+		return null;
 	}
 
 	private static final String AGENCY_COLOR = "A2211F";
@@ -133,11 +135,9 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		// @formatter:off
 		if (routeId == 750) { return ROUTE_COLOR_BLACK; }
 		// @formatter:on
-		else {
-			System.out.println("No color for route " + gRoute + "!");
-			System.exit(-1);
-		}
-		return super.getRouteColor(gRoute);
+		System.out.printf("\nUnexpected route color %s!\n", gRoute);
+		System.exit(-1);
+		return null;
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		if (mTrip.getHeadsignValue() == null || mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
-			System.out.println("Can't merge headsign for trips " + mTrip + " and " + mTripToMerge);
+			System.out.printf("\nCan't merge headsign for trips %s and %s!\n", mTrip, mTripToMerge);
 			System.exit(-1);
 			return false; // DO NOT MERGE, USED TO IDENTIFY TRIP IN REAL TIME API
 		}
@@ -214,7 +214,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		} else if (gStop.getStopId().startsWith(RZ)) {
 			stopId = 1100000;
 		} else {
-			System.out.println("Stop doesn't have an ID (start with)! " + gStop);
+			System.out.printf("\nStop doesn't have an ID (start with)! %s!\n", gStop);
 			System.exit(-1);
 			stopId = -1;
 		}
