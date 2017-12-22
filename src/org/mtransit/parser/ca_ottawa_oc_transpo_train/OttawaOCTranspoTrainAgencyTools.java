@@ -86,13 +86,13 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return -1l;
 	}
 
-	private static final String ROUTE_750_SHORT_NAME = "O-Train";
+	private static final String ROUTE_2_SHORT_NAME = "2";
 
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
 		long routeId = getRouteId(gRoute);
-		if (routeId == 750l) {
-			return ROUTE_750_SHORT_NAME;
+		if (routeId == 2L) {
+			return ROUTE_2_SHORT_NAME;
 		}
 		System.out.printf("\nUnexpected route short name %s!\n", gRoute);
 		System.exit(-1);
@@ -102,16 +102,17 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	private static final String RLN_SEPARATOR = "-";
 	private static final String RLN_SEP = " " + RLN_SEPARATOR + " ";
 
+	private static final String O_TRAIN = "O-Train";
 	private static final String GREENBORO = "Greenboro";
 	private static final String BAYVIEW = "Bayview";
 
-	private static final String ROUTE_750_LONG_NAME = BAYVIEW + RLN_SEP + GREENBORO;
+	private static final String ROUTE_2_LONG_NAME = O_TRAIN + " (" + BAYVIEW + RLN_SEP + GREENBORO + ")";
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
 		long routeId = getRouteId(gRoute);
-		if (routeId == 750l) {
-			return ROUTE_750_LONG_NAME;
+		if (routeId == 2L) {
+			return ROUTE_2_LONG_NAME;
 		}
 		System.out.printf("\nUnexpected route long name %s!\n", gRoute);
 		System.exit(-1);
@@ -130,11 +131,12 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
-		matcher.find();
-		int routeId = Integer.parseInt(matcher.group());
-		// @formatter:off
-		if (routeId == 750) { return ROUTE_COLOR_BLACK; }
-		// @formatter:on
+		if (matcher.find()) {
+			int routeId = Integer.parseInt(matcher.group());
+			// @formatter:off
+			if (routeId == 2L) { return ROUTE_COLOR_BLACK; }
+			// @formatter:on
+		}
 		System.out.printf("\nUnexpected route color %s!\n", gRoute);
 		System.exit(-1);
 		return null;
@@ -188,36 +190,40 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			return Integer.valueOf(stopCode); // using stop code as stop ID
 		}
 		Matcher matcher = DIGITS.matcher(gStop.getStopId());
-		matcher.find();
-		int digits = Integer.parseInt(matcher.group());
-		int stopId = 0;
-		if (gStop.getStopId().startsWith(EE)) {
-			stopId = 100000;
-		} else if (gStop.getStopId().startsWith(EO)) {
-			stopId = 200000;
-		} else if (gStop.getStopId().startsWith(NG)) {
-			stopId = 300000;
-		} else if (gStop.getStopId().startsWith(NO)) {
-			stopId = 400000;
-		} else if (gStop.getStopId().startsWith(WA)) {
-			stopId = 500000;
-		} else if (gStop.getStopId().startsWith(WD)) {
-			stopId = 600000;
-		} else if (gStop.getStopId().startsWith(WH)) {
-			stopId = 700000;
-		} else if (gStop.getStopId().startsWith(WI)) {
-			stopId = 800000;
-		} else if (gStop.getStopId().startsWith(WL)) {
-			stopId = 900000;
-		} else if (gStop.getStopId().startsWith(PLACE)) {
-			stopId = 1000000;
-		} else if (gStop.getStopId().startsWith(RZ)) {
-			stopId = 1100000;
-		} else {
-			System.out.printf("\nStop doesn't have an ID (start with)! %s!\n", gStop);
-			System.exit(-1);
-			stopId = -1;
+		if (matcher.find()) {
+			int digits = Integer.parseInt(matcher.group());
+			int stopId = 0;
+			if (gStop.getStopId().startsWith(EE)) {
+				stopId = 100000;
+			} else if (gStop.getStopId().startsWith(EO)) {
+				stopId = 200000;
+			} else if (gStop.getStopId().startsWith(NG)) {
+				stopId = 300000;
+			} else if (gStop.getStopId().startsWith(NO)) {
+				stopId = 400000;
+			} else if (gStop.getStopId().startsWith(WA)) {
+				stopId = 500000;
+			} else if (gStop.getStopId().startsWith(WD)) {
+				stopId = 600000;
+			} else if (gStop.getStopId().startsWith(WH)) {
+				stopId = 700000;
+			} else if (gStop.getStopId().startsWith(WI)) {
+				stopId = 800000;
+			} else if (gStop.getStopId().startsWith(WL)) {
+				stopId = 900000;
+			} else if (gStop.getStopId().startsWith(PLACE)) {
+				stopId = 1000000;
+			} else if (gStop.getStopId().startsWith(RZ)) {
+				stopId = 1100000;
+			} else {
+				System.out.printf("\nStop doesn't have an ID (start with)! %s!\n", gStop);
+				System.exit(-1);
+				stopId = -1;
+			}
+			return stopId + digits;
 		}
-		return stopId + digits;
+		System.out.printf("\nUnexpected stop ID for %s!\n", gStop);
+		System.exit(-1);
+		return -1;
 	}
 }
