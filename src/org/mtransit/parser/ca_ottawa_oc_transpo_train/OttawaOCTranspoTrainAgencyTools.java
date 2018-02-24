@@ -154,7 +154,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
-		if (mTrip.getHeadsignValue() == null || mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
+		if (mTrip.getHeadsignValue() == null || !mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
 			System.out.printf("\nCan't merge headsign for trips %s and %s!\n", mTrip, mTripToMerge);
 			System.exit(-1);
 			return false; // DO NOT MERGE, USED TO IDENTIFY TRIP IN REAL TIME API
