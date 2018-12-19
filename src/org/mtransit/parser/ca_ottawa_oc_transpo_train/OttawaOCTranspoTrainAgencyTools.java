@@ -167,11 +167,17 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
 
-	private static final Pattern ENDS_WITH_DIRECTION = Pattern.compile("(n\\.|s\\.)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ENDS_WITH_DIRECTION = Pattern.compile("(n\\.|s\\.|north/nord|south/sud)", Pattern.CASE_INSENSITIVE);
+
+	private static final Pattern O_TRAIN_ = Pattern.compile("((^|\\W){1}(o\\-train)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
+	private static final String O_TRAIN_REPLACEMENT = "$2" + "$4";
 
 	@Override
 	public String cleanStopName(String gStopName) {
-		gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		if (Utils.isUppercaseOnly(gStopName, true, true)) {
+			gStopName = gStopName.toLowerCase(Locale.ENGLISH);
+		}
+		gStopName = O_TRAIN_.matcher(gStopName).replaceAll(O_TRAIN_REPLACEMENT);
 		gStopName = ENDS_WITH_DIRECTION.matcher(gStopName).replaceAll(StringUtils.EMPTY);
 		return super.cleanStopName(gStopName);
 	}
