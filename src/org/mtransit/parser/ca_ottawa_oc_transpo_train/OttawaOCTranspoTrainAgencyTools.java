@@ -18,9 +18,9 @@ import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 
-// http://www.octranspo1.com/developers
-// http://data.ottawa.ca/en/dataset/oc-transpo-schedules
-// http://www.octranspo1.com/files/google_transit.zip
+// https://www.octranspo.com/en/plan-your-trip/travel-tools/developers/
+// https://www.octranspo.com/fr/planifiez/outils-dinformation/developpeurs/
+// https://www.octranspo.com/files/google_transit.zip
 public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	public static void main(String[] args) {
