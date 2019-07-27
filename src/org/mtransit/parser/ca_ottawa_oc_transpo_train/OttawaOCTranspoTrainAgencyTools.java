@@ -135,16 +135,19 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public String getRouteColor(GRoute gRoute) {
-		Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
-		if (matcher.find()) {
-			int routeId = Integer.parseInt(matcher.group());
-			// @formatter:off
-			if (routeId == 2L) { return ROUTE_COLOR_BLACK; }
-			// @formatter:on
+		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
+			Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
+			if (matcher.find()) {
+				int routeId = Integer.parseInt(matcher.group());
+				// @formatter:off
+				if (routeId == 2L) { return ROUTE_COLOR_BLACK; }
+				// @formatter:on
+			}
+			System.out.printf("\nUnexpected route color %s!\n", gRoute);
+			System.exit(-1);
+			return null;
 		}
-		System.out.printf("\nUnexpected route color %s!\n", gRoute);
-		System.exit(-1);
-		return null;
+		return super.getRouteColor(gRoute);
 	}
 
 	@Override
