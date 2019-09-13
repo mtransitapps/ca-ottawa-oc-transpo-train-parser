@@ -91,37 +91,38 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return -1l;
 	}
 
-	private static final String ROUTE_2_SHORT_NAME = "2";
-
 	@Override
 	public String getRouteShortName(GRoute gRoute) {
-		long routeId = getRouteId(gRoute);
-		if (routeId == 2L) {
-			return ROUTE_2_SHORT_NAME;
+		if (StringUtils.isEmpty(gRoute.getRouteShortName())) {
+			long routeId = getRouteId(gRoute);
+			if (routeId == 1L) {
+				return "1";
+			}
+			if (routeId == 2L) {
+				return "2";
+			}
+			System.out.printf("\nUnexpected route short name %s!\n", gRoute);
+			System.exit(-1);
+			return null;
 		}
-		System.out.printf("\nUnexpected route short name %s!\n", gRoute);
-		System.exit(-1);
-		return null;
+		return super.getRouteShortName(gRoute);
 	}
-
-	private static final String RLN_SEPARATOR = "-";
-	private static final String RLN_SEP = " " + RLN_SEPARATOR + " ";
-
-	private static final String O_TRAIN = "O-Train";
-	private static final String GREENBORO = "Greenboro";
-	private static final String BAYVIEW = "Bayview";
-
-	private static final String ROUTE_2_LONG_NAME = O_TRAIN + " (" + BAYVIEW + RLN_SEP + GREENBORO + ")";
 
 	@Override
 	public String getRouteLongName(GRoute gRoute) {
-		long routeId = getRouteId(gRoute);
-		if (routeId == 2L) {
-			return ROUTE_2_LONG_NAME;
+		if (StringUtils.isEmpty(gRoute.getRouteLongName())) {
+			long routeId = getRouteId(gRoute);
+			if (routeId == 1L) {
+				return "Confederation Line";
+			}
+			if (routeId == 2L) {
+				return "Trillium Line";
+			}
+			System.out.printf("\nUnexpected route long name %s!\n", gRoute);
+			System.exit(-1);
+			return null;
 		}
-		System.out.printf("\nUnexpected route long name %s!\n", gRoute);
-		System.exit(-1);
-		return null;
+		return super.getRouteLongName(gRoute);
 	}
 
 	private static final String AGENCY_COLOR = "A2211F";
@@ -131,17 +132,18 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return AGENCY_COLOR;
 	}
 
-	private static final String ROUTE_COLOR_BLACK = "231F20";
-
 	@Override
 	public String getRouteColor(GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
 			Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
 			if (matcher.find()) {
 				int routeId = Integer.parseInt(matcher.group());
-				// @formatter:off
-				if (routeId == 2L) { return ROUTE_COLOR_BLACK; }
-				// @formatter:on
+				if (routeId == 1L) {
+					return "DA291C";
+				}
+				if (routeId == 2L) {
+					return "65A233";
+				}
 			}
 			System.out.printf("\nUnexpected route color %s!\n", gRoute);
 			System.exit(-1);
@@ -170,7 +172,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return super.mergeHeadsign(mTrip, mTripToMerge);
 	}
 
-	private static final Pattern ENDS_WITH_DIRECTION = Pattern.compile("(n\\.|s\\.|north/nord|south/sud)", Pattern.CASE_INSENSITIVE);
+	private static final Pattern ENDS_WITH_DIRECTION = Pattern.compile("(" //
+			+ "n\\.|s\\.|e\\.|w\\.|o\\." //
+			+ "|" //
+			+ "north/nord|south/sud|east/est|west/ouest" //
+			+ ")", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern O_TRAIN_ = Pattern.compile("((^|\\W){1}(o\\-train)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
 	private static final String O_TRAIN_REPLACEMENT = "$2" + "$4";
