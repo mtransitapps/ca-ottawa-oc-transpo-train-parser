@@ -176,6 +176,8 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			+ "n\\.|s\\.|e\\.|w\\.|o\\." //
 			+ "|" //
 			+ "north/nord|south/sud|east/est|west/ouest" //
+			+ "|" //
+			+ "north / nord|south / sud|east / est|west / ouest" //
 			+ ")", Pattern.CASE_INSENSITIVE);
 
 	private static final Pattern O_TRAIN_ = Pattern.compile("((^|\\W){1}(o\\-train)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
