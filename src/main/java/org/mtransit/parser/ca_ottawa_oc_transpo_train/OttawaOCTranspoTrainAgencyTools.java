@@ -1,12 +1,9 @@
 package org.mtransit.parser.ca_ottawa_oc_transpo_train;
 
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
+import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.Utils;
 import org.mtransit.parser.gtfs.data.GCalendar;
 import org.mtransit.parser.gtfs.data.GCalendarDate;
@@ -17,6 +14,11 @@ import org.mtransit.parser.gtfs.data.GTrip;
 import org.mtransit.parser.mt.data.MAgency;
 import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
+
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // https://www.octranspo.com/en/plan-your-trip/travel-tools/developers/
 // https://www.octranspo.com/fr/planifiez/outils-dinformation/developpeurs/
@@ -37,11 +39,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating OC Transpo train data...");
+		MTLog.log("Generating OC Transpo train data...");
 		long start = System.currentTimeMillis();
-		this.serviceIds = extractUsefulServiceIds(args, this);
+		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
-		System.out.printf("\nGenerating OC Transpo train data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		MTLog.log("Generating OC Transpo train data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
@@ -86,9 +88,8 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		if (matcher.find()) {
 			return Long.parseLong(matcher.group());
 		}
-		System.out.printf("\nUnexpected route ID %s!\n", gRoute);
-		System.exit(-1);
-		return -1l;
+		MTLog.logFatal("Unexpected route ID %s!", gRoute);
+		return -1L;
 	}
 
 	@Override
@@ -101,8 +102,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			if (routeId == 2L) {
 				return "2";
 			}
-			System.out.printf("\nUnexpected route short name %s!\n", gRoute);
-			System.exit(-1);
+			MTLog.logFatal("Unexpected route short name %s!", gRoute);
 			return null;
 		}
 		return super.getRouteShortName(gRoute);
@@ -118,8 +118,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			if (routeId == 2L) {
 				return "Trillium Line";
 			}
-			System.out.printf("\nUnexpected route long name %s!\n", gRoute);
-			System.exit(-1);
+			MTLog.logFatal("Unexpected route long name %s!", gRoute);
 			return null;
 		}
 		return super.getRouteLongName(gRoute);
@@ -145,8 +144,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 					return "65A233";
 				}
 			}
-			System.out.printf("\nUnexpected route color %s!\n", gRoute);
-			System.exit(-1);
+			MTLog.logFatal("Unexpected route color %s!", gRoute);
 			return null;
 		}
 		return super.getRouteColor(gRoute);
@@ -165,8 +163,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
 		if (mTrip.getHeadsignValue() == null || !mTrip.getHeadsignValue().equals(mTripToMerge.getHeadsignValue())) {
-			System.out.printf("\nCan't merge headsign for trips %s and %s!\n", mTrip, mTripToMerge);
-			System.exit(-1);
+			MTLog.logFatal("Can't merge headsign for trips %s and %s!", mTrip, mTripToMerge);
 			return false; // DO NOT MERGE, USED TO IDENTIFY TRIP IN REAL TIME API
 		}
 		return super.mergeHeadsign(mTrip, mTripToMerge);
@@ -180,8 +177,8 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			+ "north / nord|south / sud|east / est|west / ouest" //
 			+ ")", Pattern.CASE_INSENSITIVE);
 
-	private static final Pattern O_TRAIN_ = Pattern.compile("((^|\\W){1}(o\\-train)(\\W|$){1})", Pattern.CASE_INSENSITIVE);
-	private static final String O_TRAIN_REPLACEMENT = "$2" + "$4";
+	private static final Pattern O_TRAIN_ = CleanUtils.cleanWords("o-train");
+	private static final String O_TRAIN_REPLACEMENT = CleanUtils.cleanWordsReplacement(StringUtils.EMPTY);
 
 	@Override
 	public String cleanStopName(String gStopName) {
@@ -214,7 +211,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		Matcher matcher = DIGITS.matcher(gStop.getStopId());
 		if (matcher.find()) {
 			int digits = Integer.parseInt(matcher.group());
-			int stopId = 0;
+			int stopId;
 			if (gStop.getStopId().startsWith(EE)) {
 				stopId = 100000;
 			} else if (gStop.getStopId().startsWith(EO)) {
@@ -238,14 +235,12 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			} else if (gStop.getStopId().startsWith(RZ)) {
 				stopId = 1100000;
 			} else {
-				System.out.printf("\nStop doesn't have an ID (start with)! %s!\n", gStop);
-				System.exit(-1);
+				MTLog.logFatal("Stop doesn't have an ID (start with)! %s!", gStop);
 				stopId = -1;
 			}
 			return stopId + digits;
 		}
-		System.out.printf("\nUnexpected stop ID for %s!\n", gStop);
-		System.exit(-1);
+		MTLog.logFatal("Unexpected stop ID for %s!", gStop);
 		return -1;
 	}
 }
