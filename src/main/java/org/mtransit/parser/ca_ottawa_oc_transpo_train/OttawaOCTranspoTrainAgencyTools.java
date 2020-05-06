@@ -118,6 +118,9 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 			if (routeId == 2L) {
 				return "Trillium Line";
 			}
+			if (routeId ==701L) { // R1
+				return "Replacement bus service";
+			}
 			MTLog.logFatal("Unexpected route long name %s!", gRoute);
 			return null;
 		}
