@@ -9,6 +9,7 @@ import org.mtransit.commons.provider.OttawaOCTranspoProviderCommons;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
 import org.mtransit.parser.gtfs.data.GRoute;
+import org.mtransit.parser.gtfs.data.GRouteType;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.mt.data.MAgency;
 
@@ -16,7 +17,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.mtransit.parser.StringUtils.EMPTY;
+import static org.mtransit.commons.StringUtils.EMPTY;
 
 // https://www.octranspo.com/en/plan-your-trip/travel-tools/developers/
 // https://www.octranspo.com/fr/planifiez/outils-dinformation/developpeurs/
@@ -38,6 +39,15 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return "OC Transpo";
 	}
 
+	@Override
+	public boolean excludeRoute(@NotNull GRoute gRoute) {
+		if (gRoute.getRouteShortName().equals("1")
+				&& GRouteType.isSameType(MAgency.ROUTE_TYPE_BUS, gRoute.getRouteType())) {
+			return KEEP;
+		}
+		return super.excludeRoute(gRoute);
+	}
+
 	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
@@ -49,7 +59,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public long getRouteId(@NotNull GRoute gRoute) {
 		//noinspection deprecation
-		Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
+		final Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
 		if (matcher.find()) {
 			return Long.parseLong(matcher.group());
 		}
@@ -76,7 +86,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getRouteLongName(@NotNull GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteLongName())) {
-			long routeId = getRouteId(gRoute);
+			final long routeId = getRouteId(gRoute);
 			if (routeId == 1L) {
 				return "Confederation Line";
 			}
