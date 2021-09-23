@@ -1,10 +1,12 @@
 package org.mtransit.parser.ca_ottawa_oc_transpo_train;
 
+import static org.mtransit.commons.RegexUtils.DIGITS;
+import static org.mtransit.commons.StringUtils.EMPTY;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
-import org.mtransit.commons.StringUtils;
 import org.mtransit.commons.provider.OttawaOCTranspoProviderCommons;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.MTLog;
@@ -13,11 +15,10 @@ import org.mtransit.parser.gtfs.data.GRouteType;
 import org.mtransit.parser.gtfs.data.GStop;
 import org.mtransit.parser.mt.data.MAgency;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.mtransit.commons.StringUtils.EMPTY;
 
 // https://www.octranspo.com/en/plan-your-trip/travel-tools/developers/
 // https://www.octranspo.com/fr/planifiez/outils-dinformation/developpeurs/
@@ -26,6 +27,12 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
 		new OttawaOCTranspoTrainAgencyTools().start(args);
+	}
+
+	@Nullable
+	@Override
+	public List<Locale> getSupportedLanguages() {
+		return LANG_EN_FR;
 	}
 
 	@Override
@@ -54,51 +61,24 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return MAgency.ROUTE_TYPE_TRAIN;
 	}
 
-	private static final Pattern DIGITS = Pattern.compile("[\\d]+");
-
 	@Override
-	public long getRouteId(@NotNull GRoute gRoute) {
-		//noinspection deprecation
-		final Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
-		if (matcher.find()) {
-			return Long.parseLong(matcher.group());
-		}
-		throw new MTLog.Fatal("Unexpected route ID %s!", gRoute);
+	public boolean defaultRouteIdEnabled() {
+		return true;
 	}
 
-	@Nullable
 	@Override
-	public String getRouteShortName(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteShortName())) {
-			long routeId = getRouteId(gRoute);
-			if (routeId == 1L) {
-				return "1";
-			}
-			if (routeId == 2L) {
-				return "2";
-			}
-			throw new MTLog.Fatal("Unexpected route short name %s!", gRoute);
-		}
-		return super.getRouteShortName(gRoute);
+	public boolean useRouteShortNameForRouteId() {
+		return true;
 	}
 
-	@NotNull
 	@Override
-	public String getRouteLongName(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteLongName())) {
-			final long routeId = getRouteId(gRoute);
-			if (routeId == 1L) {
-				return "Confederation Line";
-			}
-			if (routeId == 2L) {
-				return "Trillium Line";
-			}
-			if (routeId == 701L) { // R1
-				return "Replacement bus service";
-			}
-			throw new MTLog.Fatal("Unexpected route long name %s!", gRoute);
-		}
-		return super.getRouteLongName(gRoute);
+	public boolean defaultRouteLongNameEnabled() {
+		return true;
+	}
+
+	@Override
+	public boolean defaultAgencyColorEnabled() {
+		return true;
 	}
 
 	private static final String AGENCY_COLOR = "A2211F";
@@ -107,26 +87,6 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
-	}
-
-	@Nullable
-	@Override
-	public String getRouteColor(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteColor())) {
-			//noinspection deprecation
-			final Matcher matcher = DIGITS.matcher(gRoute.getRouteId());
-			if (matcher.find()) {
-				final int routeId = Integer.parseInt(matcher.group());
-				if (routeId == 1L) {
-					return "DA291C";
-				}
-				if (routeId == 2L) {
-					return "65A233";
-				}
-			}
-			throw new MTLog.Fatal("Unexpected route color %s!", gRoute);
-		}
-		return super.getRouteColor(gRoute);
 	}
 
 	@Override
@@ -152,6 +112,7 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	private static final Pattern O_TRAIN_ = CleanUtils.cleanWords("o-train", "o train");
 	private static final String O_TRAIN_REPLACEMENT = CleanUtils.cleanWordsReplacement(EMPTY);
 
+	@NotNull
 	private String[] getIgnoredWords() {
 		return new String[]{
 				"TOH"
