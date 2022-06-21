@@ -49,7 +49,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean excludeRoute(@NotNull GRoute gRoute) {
 		if (gRoute.getRouteShortName().equals("1")
-				&& GRouteType.isSameType(MAgency.ROUTE_TYPE_BUS, gRoute.getRouteType())) {
+				&& (
+				GRouteType.isSameType(MAgency.ROUTE_TYPE_BUS, gRoute.getRouteType())
+						|| GRouteType.isSameType(MAgency.ROUTE_TYPE_LIGHT_RAIL, gRoute.getRouteType())
+		)
+		) {
 			return KEEP;
 		}
 		return super.excludeRoute(gRoute);
