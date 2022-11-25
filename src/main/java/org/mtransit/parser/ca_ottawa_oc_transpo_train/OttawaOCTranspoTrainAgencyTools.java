@@ -48,13 +48,8 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	@Override
 	public boolean excludeRoute(@NotNull GRoute gRoute) {
-		if (gRoute.getRouteShortName().equals("1")
-				&& (
-				GRouteType.isSameType(MAgency.ROUTE_TYPE_BUS, gRoute.getRouteType())
-						|| GRouteType.isSameType(MAgency.ROUTE_TYPE_LIGHT_RAIL, gRoute.getRouteType())
-		)
-		) {
-			return KEEP;
+		if (GRouteType.isSameType(MAgency.ROUTE_TYPE_LIGHT_RAIL, gRoute.getRouteType())) {
+			return KEEP; // now light-rail in GTFS-Static
 		}
 		return super.excludeRoute(gRoute);
 	}
@@ -73,6 +68,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	@Override
 	public boolean useRouteShortNameForRouteId() {
 		return true;
+	}
+
+	@Override
+	public boolean forceStopTimeFirstNoDropOffLastNoPickupType() {
+		return true; // because merging stops by stop code: see {@link #getStopId(GStop)}
 	}
 
 	@Override
