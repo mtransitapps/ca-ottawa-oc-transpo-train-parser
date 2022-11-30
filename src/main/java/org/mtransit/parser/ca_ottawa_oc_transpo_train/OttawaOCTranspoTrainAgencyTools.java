@@ -71,11 +71,6 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 	}
 
 	@Override
-	public boolean forceStopTimeFirstNoDropOffLastNoPickupType() {
-		return true; // because merging stops by stop code: see {@link #getStopId(GStop)}
-	}
-
-	@Override
 	public boolean defaultRouteLongNameEnabled() {
 		return true;
 	}
