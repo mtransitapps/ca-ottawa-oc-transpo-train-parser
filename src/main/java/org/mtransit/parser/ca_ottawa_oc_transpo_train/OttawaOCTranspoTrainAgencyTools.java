@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 
 // https://www.octranspo.com/en/plan-your-trip/travel-tools/developers/
 // https://www.octranspo.com/fr/planifiez/outils-dinformation/developpeurs/
-// https://www.octranspo.com/files/google_transit.zip
 public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 
 	public static void main(@NotNull String[] args) {
