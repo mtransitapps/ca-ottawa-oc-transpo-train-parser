@@ -79,6 +79,11 @@ public class OttawaOCTranspoTrainAgencyTools extends DefaultAgencyTools {
 		return true;
 	}
 
+	@Override
+	public boolean allowGTFSIdOverride() {
+		return true; // breaks GTFS-RT
+	}
+
 	private static final String AGENCY_COLOR = "A2211F";
 
 	@NotNull
